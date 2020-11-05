@@ -1,8 +1,8 @@
 bl_info = {
     "name": "Node Menu Addons",
     "author": "Johnny Matthews",
-    "version": (1, 0),
-    "blender": (2, 9, 0),
+    "version": (1, 1),
+    "blender": (2, 80, 0),
     "location": "",
     "description": "",
     "warning": "",
@@ -95,25 +95,55 @@ class NASeperateCombineHSV(bpy.types.Operator):
        
         return {'FINISHED'}    
 
-def sepcom_menu_func(self, context):
+
+class NAVectorMath(bpy.types.Operator):
+    """Add A Vector Math Node"""    
+    bl_idname = "node.na_vector_math"
+    bl_label = "Add Vector Math Node"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        snode = context.space_data
+        return (snode.type == 'NODE_EDITOR')
+
+    def execute(self, context):
+        bpy.ops.node.add_node(type="ShaderNodeVectorMath")
+        return {'FINISHED'} 
+
+
+
+
+
+def converter_menu_func(self, context):
     col = self.layout.column(align=True)
     col.operator(NASeperateCombineRGB.bl_idname,text="RGB Seperate / Combine Pair")
     col.operator(NASeperateCombineXYZ.bl_idname,text="XYZ Seperate / Combine Pair")
     col.operator(NASeperateCombineHSV.bl_idname,text="HSV Seperate / Combine Pair")
     col.separator()
 
+def vector_menu_func(self, context):
+    col = self.layout.column(align=True)
+    col.operator(NAVectorMath.bl_idname,text="Vector Math")
+    col.separator()
+
+
 def register():
     bpy.utils.register_class(NASeperateCombineRGB)
     bpy.utils.register_class(NASeperateCombineXYZ)
     bpy.utils.register_class(NASeperateCombineHSV)
-    bpy.types.NODE_MT_category_SH_NEW_CONVERTOR.prepend(sepcom_menu_func)
+    bpy.utils.register_class(NAVectorMath)
+    bpy.types.NODE_MT_category_SH_NEW_CONVERTOR.prepend(converter_menu_func)
+    bpy.types.NODE_MT_category_SH_NEW_OP_VECTOR.prepend(vector_menu_func)
     
     
 def unregister():
-    bpy.types.NODE_MT_category_SH_NEW_CONVERTOR.remove(sepcom_menu_func)
+    bpy.types.NODE_MT_category_SH_NEW_CONVERTOR.remove(converter_menu_func)
+    bpy.types.NODE_MT_category_SH_NEW_OP_VECTOR.remove(vector_menu_func)
     bpy.utils.unregister_class(NASeperateCombineRGB)
     bpy.utils.unregister_class(NASeperateCombineXYZ)
     bpy.utils.unregister_class(NASeperateCombineHSV)
+    bpy.utils.unregister_class(NAVectorMath)
 
 if __name__ == "__main__":
     register()
